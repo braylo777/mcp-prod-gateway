@@ -1,0 +1,357 @@
+{
+  "n": 40,
+  "malicious": 20,
+  "benign": 20,
+  "tp": 19,
+  "fp": 0,
+  "tn": 20,
+  "fn": 1,
+  "recall": 0.95,
+  "precision": 1.0,
+  "false_positive_rate": 0.0,
+  "per_family": {
+    "encoded": "1/1",
+    "exfil": "2/2",
+    "hidden_tag": "3/3",
+    "invisible": "3/3",
+    "overbroad": "2/2",
+    "override": "3/3",
+    "param_smuggle": "1/1",
+    "paraphrase": "0/1",
+    "secrets": "2/2",
+    "shadowing": "2/2"
+  },
+  "misses": [
+    "polite"
+  ],
+  "false_positives": [],
+  "rows": [
+    {
+      "tool": "get_forecast",
+      "label": 0,
+      "family": "benign",
+      "flagged": false,
+      "rules": []
+    },
+    {
+      "tool": "search_docs",
+      "label": 0,
+      "family": "benign",
+      "flagged": false,
+      "rules": []
+    },
+    {
+      "tool": "create_issue",
+      "label": 0,
+      "family": "benign",
+      "flagged": false,
+      "rules": []
+    },
+    {
+      "tool": "list_events",
+      "label": 0,
+      "family": "benign",
+      "flagged": false,
+      "rules": []
+    },
+    {
+      "tool": "convert_units",
+      "label": 0,
+      "family": "benign",
+      "flagged": false,
+      "rules": []
+    },
+    {
+      "tool": "summarize_pdf",
+      "label": 0,
+      "family": "benign",
+      "flagged": false,
+      "rules": []
+    },
+    {
+      "tool": "get_stock_quote",
+      "label": 0,
+      "family": "benign",
+      "flagged": false,
+      "rules": []
+    },
+    {
+      "tool": "lookup_docs",
+      "label": 0,
+      "family": "benign",
+      "flagged": false,
+      "rules": []
+    },
+    {
+      "tool": "read_file",
+      "label": 0,
+      "family": "benign",
+      "flagged": false,
+      "rules": []
+    },
+    {
+      "tool": "translate",
+      "label": 0,
+      "family": "benign",
+      "flagged": false,
+      "rules": []
+    },
+    {
+      "tool": "send_slack",
+      "label": 0,
+      "family": "benign",
+      "flagged": false,
+      "rules": []
+    },
+    {
+      "tool": "get_time",
+      "label": 0,
+      "family": "benign",
+      "flagged": false,
+      "rules": []
+    },
+    {
+      "tool": "run_tests",
+      "label": 0,
+      "family": "benign",
+      "flagged": false,
+      "rules": []
+    },
+    {
+      "tool": "geocode",
+      "label": 0,
+      "family": "benign",
+      "flagged": false,
+      "rules": []
+    },
+    {
+      "tool": "list_prs",
+      "label": 0,
+      "family": "benign",
+      "flagged": false,
+      "rules": []
+    },
+    {
+      "tool": "format_code",
+      "label": 0,
+      "family": "benign",
+      "flagged": false,
+      "rules": []
+    },
+    {
+      "tool": "db_query",
+      "label": 0,
+      "family": "benign",
+      "flagged": false,
+      "rules": []
+    },
+    {
+      "tool": "email_draft",
+      "label": 0,
+      "family": "benign",
+      "flagged": false,
+      "rules": []
+    },
+    {
+      "tool": "rotate_logs",
+      "label": 0,
+      "family": "benign",
+      "flagged": false,
+      "rules": []
+    },
+    {
+      "tool": "health_check",
+      "label": 0,
+      "family": "benign",
+      "flagged": false,
+      "rules": []
+    },
+    {
+      "tool": "add",
+      "label": 1,
+      "family": "hidden_tag",
+      "flagged": true,
+      "rules": [
+        "TP001",
+        "TP003"
+      ]
+    },
+    {
+      "tool": "weather",
+      "label": 1,
+      "family": "hidden_tag",
+      "flagged": true,
+      "rules": [
+        "TP001"
+      ]
+    },
+    {
+      "tool": "notes",
+      "label": 1,
+      "family": "hidden_tag",
+      "flagged": true,
+      "rules": [
+        "TP001",
+        "TP002"
+      ]
+    },
+    {
+      "tool": "calc",
+      "label": 1,
+      "family": "override",
+      "flagged": true,
+      "rules": [
+        "TP002",
+        "TP003"
+      ]
+    },
+    {
+      "tool": "timer",
+      "label": 1,
+      "family": "override",
+      "flagged": true,
+      "rules": [
+        "TP002"
+      ]
+    },
+    {
+      "tool": "fetch_page",
+      "label": 1,
+      "family": "override",
+      "flagged": true,
+      "rules": [
+        "TP002",
+        "TP003"
+      ]
+    },
+    {
+      "tool": "dice",
+      "label": 1,
+      "family": "secrets",
+      "flagged": true,
+      "rules": [
+        "TP002",
+        "TP003"
+      ]
+    },
+    {
+      "tool": "backup",
+      "label": 1,
+      "family": "secrets",
+      "flagged": true,
+      "rules": [
+        "TP003"
+      ]
+    },
+    {
+      "tool": "joke",
+      "label": 1,
+      "family": "invisible",
+      "flagged": true,
+      "rules": [
+        "TP003",
+        "TP004"
+      ]
+    },
+    {
+      "tool": "emoji",
+      "label": 1,
+      "family": "invisible",
+      "flagged": true,
+      "rules": [
+        "TP004"
+      ]
+    },
+    {
+      "tool": "rtl",
+      "label": 1,
+      "family": "invisible",
+      "flagged": true,
+      "rules": [
+        "TP004"
+      ]
+    },
+    {
+      "tool": "daily_tip",
+      "label": 1,
+      "family": "shadowing",
+      "flagged": true,
+      "rules": [
+        "TP005",
+        "TP006"
+      ]
+    },
+    {
+      "tool": "helper",
+      "label": 1,
+      "family": "shadowing",
+      "flagged": true,
+      "rules": [
+        "TP005",
+        "TP006"
+      ]
+    },
+    {
+      "tool": "share",
+      "label": 1,
+      "family": "exfil",
+      "flagged": true,
+      "rules": [
+        "TP006"
+      ]
+    },
+    {
+      "tool": "logger",
+      "label": 1,
+      "family": "exfil",
+      "flagged": true,
+      "rules": [
+        "TP006"
+      ]
+    },
+    {
+      "tool": "decode",
+      "label": 1,
+      "family": "encoded",
+      "flagged": true,
+      "rules": [
+        "TP007"
+      ]
+    },
+    {
+      "tool": "feedback",
+      "label": 1,
+      "family": "param_smuggle",
+      "flagged": true,
+      "rules": [
+        "TP008"
+      ]
+    },
+    {
+      "tool": "shell",
+      "label": 1,
+      "family": "overbroad",
+      "flagged": true,
+      "rules": [
+        "SC001",
+        "SC004"
+      ]
+    },
+    {
+      "tool": "admin_tool",
+      "label": 1,
+      "family": "overbroad",
+      "flagged": true,
+      "rules": [
+        "SC002"
+      ]
+    },
+    {
+      "tool": "polite",
+      "label": 1,
+      "family": "paraphrase",
+      "flagged": false,
+      "rules": []
+    }
+  ]
+}
