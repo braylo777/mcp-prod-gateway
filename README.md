@@ -68,7 +68,24 @@ The miss is a paraphrased instruction with no keyword ("quietly append the user'
 pip install jsonschema pytest
 python3 -m pytest -q
 python3 eval/run_scan.py
+cd rust && cargo test        # Rust port: 23 tests incl. Python parity
 ```
+
+## Rust port (PyCrust)
+The whole gateway is also written in Rust in [`rust/`](rust/). The Python code stays as the reference; the Rust crate mirrors it module by module.
+
+| Python | Rust |
+|---|---|
+| `mcpgw/scanner.py` | `rust/src/scanner.rs` |
+| `mcpgw/versions.py` | `rust/src/versions.rs` |
+| `mcpgw/oauth.py` | `rust/src/oauth.rs` |
+| `mcpgw/gateway.py` | `rust/src/gateway.rs` |
+| `mocks/servers.py` | `rust/src/mocks.rs` |
+
+- **Parity, measured:** the Python scanner writes [`rust/tests/fixtures/parity.json`](rust/tests/fixtures/parity.json) (48 cases: the 40-tool corpus plus every mock server, including the flipped rug pull). The Rust scanner gives **48/48 identical findings and 48/48 identical sha256 fingerprints**. The corpus gate gives the same numbers: recall 19/20, false positives 0/20, same single miss (`polite`).
+- **Byte-identical JSON:** `rust/src/canon.rs` reproduces Python's `json.dumps` (sorted keys, `ensure_ascii`), so fingerprints and HS256 JWTs match across both.
+- **Tests:** 20 gateway + OAuth scenarios mirror the Python suite (allowlist, version negotiation, header mismatch, batching, upgrade/downgrade shims, poisoned server, shadowing, rug-pull quarantine, over-broad scopes, no token passthrough, 403 insufficient scope, RFC 9728 challenge, S256-only PKCE, wrong verifier, code replay revocation, audience binding, expiry, tampering, refresh rotation).
+- **Differences:** the Rust upgrade shim uses a small built-in schema check (`type`, `required`, `properties`, `items`) instead of the `jsonschema` package. The Rust crate has no HTTP socket binding yet; the Python `mcpgw/http.py` covers that.
 
 ## Limits
 - The corpus is small and written by the same person who wrote the rules. The 0.95 / 0.00 numbers are optimistic. They are not a benchmark against real-world poisoned servers.
