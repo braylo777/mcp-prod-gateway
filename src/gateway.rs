@@ -13,7 +13,8 @@ use crate::oauth::{
     protected_resource_metadata, token_hex, verify_access_token, AuthorizationServer, Clock,
     VerifyParams,
 };
-use crate::scanner::{diff_against_approved, fingerprint, scan_server, Finding, HIGH};
+use crate::policy;
+use crate::scanner::{diff_against_approved, fingerprint, Finding, HIGH};
 use crate::versions;
 
 pub const SEP: &str = "__";
@@ -247,9 +248,19 @@ impl Gateway {
         tools
     }
 
+    /// Tool names exposed by every *other* connected server (shadowing / typosquat context).
+    pub fn external_tools(&self, server_id: &str) -> std::collections::HashSet<String> {
+        self.servers
+            .iter()
+            .filter(|(id, _)| id.as_str() != server_id)
+            .flat_map(|(_, s)| s.tools.keys().cloned())
+            .collect()
+    }
+
     pub fn approve(&mut self, server_id: &str) -> Vec<Finding> {
         let tools = self.fetch_tools(server_id);
-        let findings = scan_server(&tools, &self.servers[server_id].entry.tool_scopes);
+        let ext = self.external_tools(server_id);
+        let findings = policy::scan_server(&tools, &self.servers[server_id].entry.tool_scopes, &ext);
         if findings.iter().any(|f| f.severity == HIGH) {
             self.servers.get_mut(server_id).unwrap().status = Status::Rejected;
             self.log(
@@ -272,9 +283,10 @@ impl Gateway {
     /// Re-fetch definitions and quarantine anything that drifted from the approved snapshot.
     pub fn recheck(&mut self, server_id: &str) -> Vec<Finding> {
         let tools = self.fetch_tools(server_id);
+        let ext = self.external_tools(server_id);
         let s = &self.servers[server_id];
         let mut all = diff_against_approved(&tools, &s.approved);
-        all.extend(scan_server(&tools, &s.entry.tool_scopes));
+        all.extend(policy::scan_server(&tools, &s.entry.tool_scopes, &ext));
         for f in &all {
             if f.rule == "RP001" || f.rule == "RP002" || f.severity == HIGH {
                 let s = self.servers.get_mut(server_id).unwrap();
@@ -298,7 +310,7 @@ impl Gateway {
             .flat_map(|e| e.tool_scopes.values().flatten().cloned())
             .collect();
         let scopes: Vec<String> = scopes.into_iter().collect();
-        protected_resource_metadata(&self.resource, &[self.auth.issuer.clone()], &scopes)
+        protected_resource_metadata(&self.resource, std::slice::from_ref(&self.auth.issuer), &scopes)
     }
 
     pub fn handle_http(&mut self, headers: &Headers, body: &Value) -> (u16, Headers, Value) {

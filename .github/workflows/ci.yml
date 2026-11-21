@@ -1,0 +1,51 @@
+name: ci
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  rust:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy, llvm-tools-preview
+      - uses: Swatinem/rust-cache@v2
+      - name: Test (debug + release)
+        run: |
+          cargo test
+          cargo test --release
+      - name: Corpus is up to date
+        run: cargo run --release --bin gen-corpus -- --check
+      - name: Fuzz (proptest, more cases)
+        run: PROPTEST_CASES=5000 cargo test --release --test fuzz
+      - name: Latency bench
+        run: cargo run --release --bin bench
+      - name: Clippy
+        run: cargo clippy --all-targets -- -D warnings
+      - name: Coverage
+        run: |
+          cargo install cargo-llvm-cov --locked
+          cargo llvm-cov --release --ignore-filename-regex 'src/bin/' --summary-only
+          cargo llvm-cov report --release --ignore-filename-regex 'src/bin/' --lcov --output-path lcov.info
+      - uses: actions/upload-artifact@v4
+        with:
+          name: lcov
+          path: lcov.info
+
+  python-reference:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install "jsonschema>=4" "pytest>=7"
+      - name: Reference tests
+        run: python -m pytest -q reference/tests
+      - name: Parity fixtures are fresh
+        run: |
+          python analysis/gen_parity.py --check
+          python analysis/gen_parity_core.py --check

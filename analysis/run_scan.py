@@ -6,7 +6,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-from eval.corpus import CORPUS  # noqa: E402
+sys.path.insert(0, str(ROOT / "reference"))
+from analysis.corpus import CORPUS  # noqa: E402
 from mcpgw.scanner import HIGH, MEDIUM, scan_poisoning, scan_scopes  # noqa: E402
 
 KNOWN = {"send_email", "get_forecast"}  # tools from other servers in the same session

@@ -1,0 +1,43 @@
+{
+  "caught": 650,
+  "attacks": 690,
+  "recall": 0.942,
+  "per_family": {
+    "confused_deputy": "60/60",
+    "covert_paraphrase": "50/50",
+    "exfil": "40/40",
+    "holdout_paraphrase": "0/40",
+    "obfuscated": "110/110",
+    "overbroad": "30/30",
+    "param_smuggling": "30/30",
+    "prompt_injection": "70/70",
+    "rug_pull": "70/70",
+    "shadowing": "70/70",
+    "tool_poisoning": "120/120"
+  },
+  "benign_manifests": 1000,
+  "benign_tools": 2398,
+  "fp_manifests": 0,
+  "fp_rate": 0.0,
+  "scope_advisory_manifests": 74,
+  "rust_parity": "3818/3818",
+  "rust_parity_scanner": "3206/3206",
+  "rust_parity_core": "612/612",
+  "tests": 345,
+  "tests_passing": 345,
+  "tests_rust": 322,
+  "tests_python_reference": 23,
+  "loc_rust": 6234,
+  "loc_python": 1694,
+  "p99_ms": 0.129,
+  "p99_ms_by_check": {
+    "deep_rules": 0.059,
+    "fingerprint": 0.011,
+    "full_scan_tool": 0.129,
+    "http_parse": 0.001,
+    "rug_pull_diff": 0.008,
+    "v1_poisoning": 0.069,
+    "v1_scopes": 0.002
+  },
+  "coverage": 95.6
+}

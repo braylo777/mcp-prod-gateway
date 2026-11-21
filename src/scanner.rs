@@ -28,7 +28,7 @@ pub struct Finding {
 }
 
 impl Finding {
-    fn new(rule: &str, severity: &str, tool: &str, detail: String) -> Self {
+    pub fn new(rule: &str, severity: &str, tool: &str, detail: String) -> Self {
         Finding {
             rule: rule.into(),
             severity: severity.into(),
@@ -82,7 +82,7 @@ fn texts(v: &Value, path: &str, out: &mut Vec<(String, String)>) {
 
 macro_rules! re {
     ($name:ident, $pat:expr) => {
-        static $name: LazyLock<Regex> = LazyLock::new(|| Regex::new($pat).unwrap());
+        pub(crate) static $name: LazyLock<Regex> = LazyLock::new(|| Regex::new($pat).unwrap());
     };
 }
 
@@ -184,6 +184,26 @@ fn truthy(v: Option<&Value>) -> bool {
     }
 }
 
+thread_local! {
+    static WORD_RE: std::cell::RefCell<std::collections::HashMap<String, Regex>> = Default::default();
+}
+
+/// `\b{escaped name}\b`, compiled once per thread per name (bounded at 4096 entries).
+pub(crate) fn word_regex(name: &str) -> Regex {
+    WORD_RE.with(|c| {
+        let mut m = c.borrow_mut();
+        if let Some(r) = m.get(name) {
+            return r.clone();
+        }
+        if m.len() >= 4096 {
+            m.clear();
+        }
+        let r = Regex::new(&format!(r"\b{}\b", regex::escape(name))).unwrap();
+        m.insert(name.to_string(), r.clone());
+        r
+    })
+}
+
 pub fn scan_poisoning(tool: &Value, known_tool_names: &HashSet<String>) -> Vec<Finding> {
     let name = tool_name(tool);
     let mut found = Vec::new();
@@ -255,8 +275,7 @@ pub fn scan_poisoning(tool: &Value, known_tool_names: &HashSet<String>) -> Vec<F
     let mut others: Vec<&String> = known_tool_names.iter().filter(|n| **n != name).collect();
     others.sort();
     for other in others {
-        let re = Regex::new(&format!(r"\b{}\b", regex::escape(other))).unwrap();
-        if re.is_match(&joined) {
+        if word_regex(other).is_match(&joined) {
             found.push(Finding::new(
                 "TP005",
                 HIGH,

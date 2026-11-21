@@ -14,7 +14,7 @@ fn write(v: &Value, sort: bool, compact: bool, out: &mut String) {
     match v {
         Value::Null => out.push_str("null"),
         Value::Bool(b) => out.push_str(if *b { "true" } else { "false" }),
-        Value::Number(n) => out.push_str(&n.to_string()),
+        Value::Number(n) => out.push_str(&py_number(n)),
         Value::String(s) => escape(s, out),
         Value::Array(a) => {
             out.push('[');
@@ -68,6 +68,27 @@ fn escape(s: &str, out: &mut String) {
     out.push('"');
 }
 
+/// Python `repr(float)` formatting: shortest digits, positional for 1e-4 <= |x| < 1e16
+/// (always with a fractional part), otherwise `d.ddde±XX` with at least two exponent digits.
+pub fn py_number(n: &serde_json::Number) -> String {
+    if n.is_i64() || n.is_u64() {
+        return n.to_string();
+    }
+    let f = n.as_f64().unwrap_or(0.0);
+    if f == 0.0 {
+        return if f.is_sign_negative() { "-0.0".into() } else { "0.0".into() };
+    }
+    let sci = format!("{f:e}");
+    let (mant, exp) = sci.split_once('e').unwrap();
+    let exp: i32 = exp.parse().unwrap();
+    if (-4..16).contains(&exp) {
+        let s = format!("{f}");
+        if s.contains('.') { s } else { format!("{s}.0") }
+    } else {
+        format!("{mant}e{}{:02}", if exp < 0 { '-' } else { '+' }, exp.abs())
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -94,3 +115,4 @@ mod tests {
         );
     }
 }
+
